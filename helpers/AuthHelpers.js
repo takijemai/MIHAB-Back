@@ -9,8 +9,10 @@ module.exports = {
    //let token = req.cookies.auth 
    try {
     const tokenData = await Token.findOne({ token: req.user.token }); 
+    console.log(tokenData);
     if (tokenData) {
       const token = tokenData.token;
+      console.log(token);
       const data = jwt.verify(token, dbConfig.secret);
       req.user = data;
       req.username = data.username;
