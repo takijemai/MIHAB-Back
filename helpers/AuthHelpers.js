@@ -13,7 +13,9 @@ module.exports = {
  // If token is not found in cookies, we search in MongoDB database
  if (!token) {
   try {
-    const tokenData = await Token.findOne({ token: token }); 
+    const authorizationHeader = req.headers.authorization;
+    const tokenread = authorizationHeader.split(' ')[1]; 
+    const tokenData = await Token.findOne({ token: tokenread }); 
     console.log(tokenData)
     if (tokenData) {
       token = tokenData.token;
