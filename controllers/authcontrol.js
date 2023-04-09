@@ -62,9 +62,16 @@ module.exports = {
         }
       );
       res.cookie("auth", token);
-      const tokenData = new Token({ token, userId: user._id });
-      console.log(tokenData)
-      await tokenData.save();
+      const existingToken = await Token.findOne({ userId: user._id });
+            if(existingToken){
+              existingToken.token= token;
+              await existingToken.save();
+            }
+            else {
+              const tokenData = new Token({ token, userId: user._id });
+              //console.log(tokenData)
+              await tokenData.save();
+            }
 
       // Send verification email
       const verificationLink = `http://localhost:3000/api/mihab/verify?email=${req.body.email}&code=${verificationCode}`;
@@ -148,7 +155,7 @@ module.exports = {
           console.log("Verification email sent: " + info.response);
 
           User.create(newuser)
-            .then((user) => {
+            .then(async (user) => {
               const token = jwt.sign(
                 { _id: user._id, username: user.username },
                 dbConfig.secret,
@@ -157,9 +164,16 @@ module.exports = {
                 }
               );
               res.cookie("auth", token);
+              const existingToken = await Token.findOne({ userId: user._id });
+            if(existingToken){
+              existingToken.token= token;
+              await existingToken.save();
+            }
+            else {
               const tokenData = new Token({ token, userId: user._id });
-              tokenData.save();
-              console.log(tokenData)
+              //console.log(tokenData)
+              await tokenData.save();
+            }
               //console.log(user)
               res
                 .status(HttpStatus.StatusCodes.CREATED)
@@ -204,6 +218,16 @@ module.exports = {
         }
       );
       res.cookie("auth", token);
+      const existingToken = await Token.findOne({ userId: user._id });
+           if(existingToken){
+              existingToken.token= token;
+              await existingToken.save();
+            }
+            else {
+              const tokenData = new Token({ token, userId: user._id });
+              //console.log(tokenData)
+              await tokenData.save();
+            }
       return res
         .status(HttpStatus.StatusCodes.OK)
         .json({ message: "Login successful", user, token });
@@ -229,7 +253,7 @@ module.exports = {
 
         return bcrypt
           .compare(req.body.password, user.password)
-          .then((result) => {
+          .then(async (result) => {
             if (!result) {
               return res
                 .status(HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR)
@@ -244,6 +268,17 @@ module.exports = {
               }
             );
             res.cookie("auth", token);
+            const existingToken = await Token.findOne({ userId: user._id });
+            if(existingToken){
+              existingToken.token= token;
+              await existingToken.save();
+            }
+            else {
+              const tokenData = new Token({ token, userId: user._id });
+              //console.log(tokenData)
+              await tokenData.save();
+            }
+            
 
             return res
               .status(HttpStatus.StatusCodes.OK)
