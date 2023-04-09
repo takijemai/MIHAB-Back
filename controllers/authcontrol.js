@@ -63,6 +63,7 @@ module.exports = {
       );
       res.cookie("auth", token);
       const tokenData = new Token({ token, userId: user._id });
+      console.log(tokenData)
       await tokenData.save();
 
       // Send verification email
@@ -158,6 +159,7 @@ module.exports = {
               res.cookie("auth", token);
               const tokenData = new Token({ token, userId: user._id });
               tokenData.save();
+              console.log(tokenData)
               //console.log(user)
               res
                 .status(HttpStatus.StatusCodes.CREATED)
