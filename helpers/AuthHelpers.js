@@ -7,16 +7,12 @@ const Token = require('../models/token');
 module.exports = {
   VerifyToken: async (req, res, next) => {
    const token = req.cookies.auth  ;
-//console.log(token)
-
-
+//console.log(token);
  // If token is not found in cookies, we search in MongoDB database
  if (!token) {
   try {
-    const authorizationHeader = req.headers.authorization;
-    const tokenread = authorizationHeader.split(' ')[1]; 
-    const tokenData = await Token.findOne({ token: tokenread }); 
-    console.log(tokenData)
+    const tokenData = await Token.findOne({ token: token }); 
+    console.log(tokenData);
     if (tokenData) {
       token = tokenData.token;
     }
