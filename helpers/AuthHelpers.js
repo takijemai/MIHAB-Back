@@ -7,8 +7,9 @@ const Token = require('../models/token');
 module.exports = {
   VerifyToken: async (req, res, next) => {
    //let token = req.cookies.auth 
+   
    try {
-    const tokenData = await Token.findOne({ token: req.user.token }); 
+    const tokenData = await Token.findOne({ userId: req.user._id }); 
     console.log(tokenData);
     if (tokenData) {
       const token = tokenData.token;
