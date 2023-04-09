@@ -2,10 +2,11 @@ const User = require('../models/user')
 const Helpers = require('../helpers/helpers')
 const HttpStatus = require ('http-status-codes')
 const cloudinary = require('cloudinary')
+const dbConfig = require('../config/secret');
 
 cloudinary.config({ 
     cloud_name: 'dq1utqamt', 
-    api_key: '884673834196555', 
+    api_key: dbConfig.apikeycloudinary, 
     api_secret: '9gXehqpf2Xdan-ZIittGfKeLzvA' 
   });
 

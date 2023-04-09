@@ -6,8 +6,6 @@ const bcrypt = require("bcryptjs");
 const { google, GoogleAuth } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
-const clientId =
-  "781379256514-5uq3mdudlrujqvp2mmn8mosa8hc4sgob.apps.googleusercontent.com";
 const nodemailer = require("nodemailer");
 // the nodemailer transporter config
 const transporter = nodemailer.createTransport({

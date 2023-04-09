@@ -79,7 +79,7 @@ app.use(cookies())
  
 
 mongoose.Promise= global.Promise
-mongoose.connect('mongodb+srv://chatapp:Ta50356686@cluster0.ciybmqk.mongodb.net/chatapp?retryWrites=true&w=majority')
+mongoose.connect(dbConfig.url)
 
 
 
@@ -92,7 +92,7 @@ app.use('/api/mihab', image)
 
 function getOAuthToken() {
     return new Promise((resolve, reject) => {
-        const apiKey = 'i8bcbphlou1ueo9b8ahue932h5s6yo7d';
+        const apiKey = dbConfig.apikey;
         const secret = '6ZVNFSiWCXi4';
         const credentials = Buffer.from(`${apiKey}:${secret}`).toString('base64');
         const options = {
