@@ -7,13 +7,14 @@ const Token = require('../models/token');
 module.exports = {
   VerifyToken: async (req, res, next) => {
    //let token = req.cookies.auth 
-   
+   //console.log( req.params.id);
    try {
-    const tokenData = await Token.findOne({ userId: req.user._id }); 
-    console.log(tokenData);
+    
+    const tokenData = await Token.findOne({ userId: req.params.id }); 
+    //console.log(tokenData);
     if (tokenData) {
       const token = tokenData.token;
-      console.log(token);
+      
       const data = jwt.verify(token, dbConfig.secret);
       req.user = data;
       req.username = data.username;
