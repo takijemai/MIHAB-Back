@@ -8,11 +8,11 @@ module.exports = {
   VerifyToken: async (req, res, next) => {
    const token = req.cookies.auth  ;
    
-console.log(req.user.token);
+//console.log(req.user.token);
  // If token is not found in cookies, we search in MongoDB database
  if (!token) {
   try {
-    const tokenData = await Token.findOne({ token: token }); 
+    const tokenData = await Token.findOne({ token: req.user.token }); 
     console.log(tokenData);
     if (tokenData) {
       token = tokenData.token;
