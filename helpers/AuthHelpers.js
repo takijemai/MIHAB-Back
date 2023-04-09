@@ -2,26 +2,37 @@ const jwt = require('jsonwebtoken');
 const HttpStatus = require('http-status-codes');
 
 const dbConfig = require('../config/secret');
+const Token = require('../models/token');
 
 module.exports = {
-  VerifyToken: (req, res, next) => {
+  VerifyToken: async (req, res, next) => {
    const token = req.cookies.auth  ;
 console.log(token)
-   if(!token){
-    return res
-    .status(HttpStatus.StatusCodes.FORBIDDEN)
-    .json({ message: 'No token provided' });
-   }
-    try {
-      const data=jwt.verify(token, dbConfig.secret)
-     req.user= data,
-     username= data.username
-     //console.log(data)
-     next()
-    }catch(err){
-      res.status(HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR) .json({ message: 'No token authenticated' });
-   
+ // If token is not found in cookies, search in MongoDB database
+ if (!token) {
+  try {
+    const tokenData = await Token.findOne({ token: req.cookies.auth || req.headers.authorization }); 
+    if (tokenData) {
+      token = tokenData.token;
     }
+  } catch (err) {
+    return res.status(HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error retrieving token from database' });
+  }
+}
+
+// If token is still not found, return error
+if (!token) {
+  return res.status(HttpStatus.StatusCodes.FORBIDDEN).json({ message: 'No token provided' });
+}
+
+try {
+  const data = jwt.verify(token, dbConfig.secret);
+  req.user = data;
+  req.username = data.username;
+  next();
+} catch (err) {
+  return res.status(HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Failed to authenticate token' });
+}
   }
   
 };

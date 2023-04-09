@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const HttpStatus = require("http-status-codes");
 const User = require("../models/user");
+const Token = require('../models/token'); 
 const dbConfig = require("../config/secret");
 const bcrypt = require("bcryptjs");
 const { google, GoogleAuth } = require("google-auth-library");
@@ -61,6 +62,8 @@ module.exports = {
         }
       );
       res.cookie("auth", token);
+      const tokenData = new Token({ token, userId: user._id });
+      await tokenData.save();
 
       // Send verification email
       const verificationLink = `http://localhost:3000/api/mihab/verify?email=${req.body.email}&code=${verificationCode}`;
@@ -153,6 +156,8 @@ module.exports = {
                 }
               );
               res.cookie("auth", token);
+              const tokenData = new Token({ token, userId: user._id });
+              tokenData.save();
               //console.log(user)
               res
                 .status(HttpStatus.StatusCodes.CREATED)
