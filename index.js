@@ -150,7 +150,7 @@ return new Promise((resolve, reject) => {
 
 
 
-
-server.listen(3000, function(req,res){
-    console.log('app work good')
+const port = process.env.PORT || 3000;
+server.listen(port, function(req,res){
+    console.log(`App is running on port ${port}`);
 })
