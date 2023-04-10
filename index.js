@@ -18,7 +18,7 @@ app.use(cors(corsOptions))
 const server = require('http').createServer(app)
 const io = require('socket.io')(server,{
     cors: {
-    origin:  ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
+    origin:  ['http://localhost:8100', 'https://mihab-back.herokuapp.com', '192.168.18.29'],
     credentials:true
 }},
 );
