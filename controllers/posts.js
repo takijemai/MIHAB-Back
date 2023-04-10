@@ -8,7 +8,7 @@ const dbConfig = require('../config/secret');
 
 cloudinary.config({
   cloud_name : 'dq1utqamt',
-  api_key: dbConfig.apikeycloudinary,
+  api_key: '884673834196555',
   api_secret:'9gXehqpf2Xdan-ZIittGfKeLzvA'
 })
 
@@ -115,7 +115,7 @@ module.exports = {
 
 
 async GetAllPosts(req,res){
-  //console.log(req.user)
+  console.log(req.user)
  try {
    const today= moment().startOf('day')
   const tomorow= moment(today).add(1,'day')
@@ -123,6 +123,7 @@ async GetAllPosts(req,res){
 const posts= await Post.find({
   //likesdate:{$gte:today.toDate(),$lt:tomorow.toDate()}
 }).populate('user').sort({created: -1})
+//console.log(posts)
 
 const top = await Post.find({
   'favorites': {

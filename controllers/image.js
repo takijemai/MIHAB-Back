@@ -6,7 +6,7 @@ const dbConfig = require('../config/secret');
 
 cloudinary.config({ 
     cloud_name: 'dq1utqamt', 
-    api_key: dbConfig.apikeycloudinary, 
+    api_key: '884673834196555',
     api_secret: '9gXehqpf2Xdan-ZIittGfKeLzvA' 
   });
 

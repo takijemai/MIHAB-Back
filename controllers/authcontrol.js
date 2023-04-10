@@ -190,7 +190,7 @@ module.exports = {
   },
 
   async loginUser(req, res) {
-  
+  console.log('connected')
 
     if (req.body.google_credentials) {
       const client = new OAuth2Client();
@@ -217,8 +217,10 @@ module.exports = {
           expiresIn: "5h",
         }
       );
+      //console.log(token)
       res.cookie("auth", token);
       const existingToken = await Token.findOne({ userId: user._id });
+      //console.log(existingToken);
            if(existingToken){
               existingToken.token= token;
               await existingToken.save();
@@ -267,6 +269,7 @@ module.exports = {
                 expiresIn: "5h",
               }
             );
+            //console.log(token)
             res.cookie("auth", token);
             const existingToken = await Token.findOne({ userId: user._id });
             if(existingToken){
