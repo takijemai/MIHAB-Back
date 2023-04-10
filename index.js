@@ -8,7 +8,7 @@ const joi = require('joi')
 const request = require('request')
 const cors = require('cors')
 const corsOptions ={
-    origin:   '*',
+    origin:   ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200
 }
@@ -18,11 +18,11 @@ app.use(cors(corsOptions))
 const server = require('http').createServer(app)
 const io = require('socket.io')(server,{
     cors: {
-    origin:  '*',
+    origin:  ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
     credentials:true
 }},
 );
-//['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29']
+
 
 app.get('/getToken', async function (req, res) {
     try {
