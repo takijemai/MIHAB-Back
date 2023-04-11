@@ -7,28 +7,28 @@ const _ = require('lodash')
 const joi = require('joi')
 const request = require('request')
 const cors = require('cors')
-const corsOptions ={
-    // origin:   ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
-    origin:  ['*'],
-    credentials:true,  
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Content-Length', 'Authorization'],          //access-control-allow-credentials:true
-    optionSuccessStatus:200,
-}
+// const corsOptions ={
+//     // origin:   ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
+//     origin:  ['*'],
+//     credentials:true,  
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     exposedHeaders: ['Content-Length', 'Authorization'],          //access-control-allow-credentials:true
+//     optionSuccessStatus:200,
+// }
 const app = express()
 //app.use(cors())
-app.use(cors(corsOptions))
+app.use(cors('*'))
 const server = require('http').createServer(app)
 const io = require('socket.io')(server,{
     cors: {
     // origin:  ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
     origin:  ['*'],
-    credentials:true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Content-Length', 'Authorization'],          //access-control-allow-credentials:true
-    optionSuccessStatus:200,
+    // credentials:true,
+    // methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    // allowedHeaders: ['Content-Type', 'Authorization'],
+    // exposedHeaders: ['Content-Length', 'Authorization'],          //access-control-allow-credentials:true
+    // optionSuccessStatus:200,
 }},
 );
 
