@@ -8,7 +8,8 @@ const joi = require('joi')
 const request = require('request')
 const cors = require('cors')
 const corsOptions ={
-    origin:   ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
+    // origin:   ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
+    origin:  ['*'],
     credentials:true,  
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -21,7 +22,8 @@ app.use(cors(corsOptions))
 const server = require('http').createServer(app)
 const io = require('socket.io')(server,{
     cors: {
-    origin:  ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
+    // origin:  ['http://localhost:8100', 'https://mihab-back.herokuapp.com/', '192.168.18.29'],
+    origin:  ['*'],
     credentials:true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -159,5 +161,5 @@ return new Promise((resolve, reject) => {
 const ip = '192.168.18.29';
 const port = process.env.PORT || 3000;
 server.listen(port, function(req,res){
-    console.log(`App is running on IP address  and port ${port}`);
+    console.log(`App is running on  port ${port}`);
 })
