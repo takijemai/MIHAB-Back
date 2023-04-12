@@ -289,7 +289,7 @@ module.exports = {
 
             return res
               .status(HttpStatus.StatusCodes.OK)
-              .header('auth', token)
+              .header('auth-token', token)
               .json({ message: "Login successful", user, token });
           });
       })
