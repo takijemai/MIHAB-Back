@@ -7,22 +7,26 @@ const Token = require('../models/token');
 module.exports = {
   VerifyToken: async (req, res, next) => {
     try {
-      let token;
+
+      const token = req.cookies.auth || req.headers.authorization.split(' ')[1];
+
+
       // Check if token exists in database
-      const tokenData = await Token.findOne({ userId: req.params.id });
+      // const tokenData = await Token.findOne({ token: token });
   
-      if (tokenData) {
-        token = tokenData.token;
-      } else {
-        // If token not found in dabtabse, we check req.cookies.auth
-        token = req.cookies.auth;
-      }
+      // if (tokenData) {
+      //   token = tokenData.token;
+      // } else {
+      //   // If token not found in dabtabse, we check req.cookies.auth
+      //   token = req.cookies.auth;
+      // }
   
       if (!token) {
         // If token is still not found, return forbidden status
         return res
           .status(HttpStatus.StatusCodes.FORBIDDEN)
           .json({ message: 'No token provided' });
+        
       } else {
         // Verify the token and set req.user and req.username
         const data = jwt.verify(token, dbConfig.secret);
