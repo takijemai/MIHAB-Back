@@ -5,23 +5,35 @@ const dbConfig = require('../config/secret');
 const Token = require('../models/token');
 
 module.exports = {
-  VerifyToken: (req, res, next) => {
-   const token = req.cookies.auth  ;
-//console.log(token)
-   if(!token){
-    return res
-    .status(HttpStatus.StatusCodes.FORBIDDEN)
-    .json({ message: 'No token provided' });
-   }
+  VerifyToken: async (req, res, next) => {
     try {
-      const data=jwt.verify(token, dbConfig.secret)
-     req.user= data,
-     username= data.username
-     //console.log(data)
-     next()
-    }catch(err){
-      res.status(HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR) .json({ message: 'No token authenticated' });
-   
+      let token;
+      // Check if token exists in database
+      const tokenData = await Token.findOne({ userId: req.params.id });
+  
+      if (tokenData) {
+        token = tokenData.token;
+      } else {
+        // If token not found in dabtabse, we check req.cookies.auth
+        token = req.cookies.auth;
+      }
+  
+      if (!token) {
+        // If token is still not found, return forbidden status
+        return res
+          .status(HttpStatus.StatusCodes.FORBIDDEN)
+          .json({ message: 'No token provided' });
+      } else {
+        // Verify the token and set req.user and req.username
+        const data = jwt.verify(token, dbConfig.secret);
+        req.user = data;
+        req.username = data.username;
+        next();
+      }
+    } catch (err) {
+      return res
+        .status(HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: 'Failed to authenticate token' });
     }
   }
 }
