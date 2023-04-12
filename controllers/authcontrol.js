@@ -91,6 +91,7 @@ module.exports = {
 
       return res
         .status(HttpStatus.StatusCodes.CREATED)
+        .header('auth-token', token)
         .json({ message: "user created successful", user, token });
     }
     //console.log(req.body)
@@ -175,8 +176,10 @@ module.exports = {
               await tokenData.save();
             }
               //console.log(user)
+              //console.log(req.headers);
               res
                 .status(HttpStatus.StatusCodes.CREATED)
+                .header('auth-token', token)
                 .json({ message: "user created successful", user, token });
             })
             .catch((err) => {
@@ -232,6 +235,7 @@ module.exports = {
             }
       return res
         .status(HttpStatus.StatusCodes.OK)
+        .header('auth-token', token)
         .json({ message: "Login successful", user, token });
     }
 
@@ -285,6 +289,7 @@ module.exports = {
 
             return res
               .status(HttpStatus.StatusCodes.OK)
+              .header('auth', token)
               .json({ message: "Login successful", user, token });
           });
       })
