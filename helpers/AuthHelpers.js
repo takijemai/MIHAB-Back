@@ -7,7 +7,7 @@ const dbConfig = require('../config/secret');
 module.exports = {
   VerifyToken: (req, res, next) => {
     const token = req.headers.authorization  ;
- console.log(token)
+ //console.log(token)
     if(!token){
      return res
      .status(HttpStatus.StatusCodes.FORBIDDEN)
@@ -15,8 +15,10 @@ module.exports = {
     }
      try {
        const data=jwt.verify(token, dbConfig.secret)
+       //console.log(data)
       req.user= data,
-      username= data.username
+      username= data.username,
+      _id= data._id
       //console.log(data)
       next()
      }catch(err){

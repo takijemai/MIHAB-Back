@@ -25,7 +25,7 @@ module.exports = {
     //console.log(req.body.google_credentials)
 
     if (req.body.google_credentials) {
-      const client = new OAuth2Client();
+      const client = new OAuth2Client(dbConfig.clientId);
       const ticket = await client.verifyIdToken({
         idToken: req.body.google_credentials.id_token,
         audience: process.env.GOOGLE_CLIENT_ID,
@@ -193,10 +193,10 @@ module.exports = {
   },
 
   async loginUser(req, res) {
-  
+  //console.log(req.body.google_credentials);
 
     if (req.body.google_credentials) {
-      const client = new OAuth2Client();
+      const client = new OAuth2Client(dbConfig.clientId);
       const ticket = await client.verifyIdToken({
         idToken: req.body.google_credentials.id_token,
         audience: process.env.GOOGLE_CLIENT_ID,
