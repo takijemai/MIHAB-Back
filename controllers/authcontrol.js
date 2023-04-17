@@ -8,6 +8,11 @@ const { google, GoogleAuth } = require("google-auth-library");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const nodemailer = require("nodemailer");
+const admin = require("firebase-admin");
+const serviceAccount = require("../../mihab-afaa1-firebase-adminsdk-i9jhe-682e873f79.json");
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 // the nodemailer transporter config
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -22,77 +27,79 @@ module.exports = {
     // if (!req.body.google_credentials || !req.body.google_credentials.id_token) {
     //   return res.status(HttpStatus.StatusCodes.BAD_REQUEST).json({ message: 'invalid google_credentials' });
     //  }
-    //console.log(req.body.google_credentials)
-
+    console.log(req.body.google_credentials)
     if (req.body.google_credentials) {
-      const client = new OAuth2Client(dbConfig.clientId);
-      const ticket = await client.verifyIdToken({
-        idToken: req.body.google_credentials.id_token,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
-      const payload = ticket.getPayload();
-      const email = payload["email"];
-      const name = payload["given_name"];
-
-      //console.log(payload)
-      // Check if the user already exists in the database
-      const existingUser = await User.findOne({ email: email });
-      if (existingUser) {
-        res
-          .status(HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR)
-          .json({ message: "Google account already in use" });
-        return;
-      }
-      // Generate a verification code
-      const verificationCode = Math.floor(100000 + Math.random() * 900000);
-      console.log(verificationCode);
-      // Create user with Google credentials
-      const user = await User.create({
-        username: name,
-        email: email,
-        isVerified: false,
-        verificationCode: verificationCode,
-      });
-
-      const token = jwt.sign(
-        { _id: user._id, username: user.username },
-        dbConfig.secret,
-        {
-          expiresIn: "5h",
+      try {
+        const tokens = req.body.google_credentials.id_token;
+        //console.log(tokens)
+        // Verify the token using firebase-admin library
+        const decodedToken = await admin.auth().verifyIdToken(tokens);
+        const email = decodedToken.email;
+        const name = decodedToken.name;
+  
+        // Check if the user already exists in the database
+        const existingUser = await User.findOne({ email: email });
+        if (existingUser) {
+          res
+            .status(HttpStatus.StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ message: "Google account already in use" });
+          return;
         }
-      );
-      res.cookie("auth", token);
-      const existingToken = await Token.findOne({ userId: user._id });
-            if(existingToken){
-              existingToken.token= token;
-              await existingToken.save();
-            }
-            else {
-              const tokenData = new Token({ token, userId: user._id });
-              //console.log(tokenData)
-              await tokenData.save();
-            }
-
-      // Send verification email
-      const verificationLink = `http://localhost:3000/api/mihab/verify?email=${req.body.email}&code=${verificationCode}`;
-      const mailOptions = {
-        from: "mihabappual@gmail.com",
-        to: req.body.email,
-        subject: "Please verify your email address",
-        html: `<p>Dear ${req.body.username},</p><p>Please click on the following link to verify your email address:</p><p><a href="${verificationLink}">${verificationLink}</a></p><p>Thanks,</p><p>Your App Team</p>`,
-      };
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log(error);
+  
+        // Generate a verification code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000);
+        console.log(verificationCode);
+  
+        // Create user with Google credentials
+        const user = await User.create({
+          username: name,
+          email: email,
+          isVerified: false,
+          verificationCode: verificationCode,
+        });
+  
+        // Generate JWT and set it as a cookie
+        const token = jwt.sign(
+          { _id: user._id, username: user.username },
+          dbConfig.secret,
+          {
+            expiresIn: "5h",
+          }
+        );
+        res.cookie("auth", token);
+        const existingToken = await Token.findOne({ userId: user._id });
+        if (existingToken) {
+          existingToken.token = token;
+          await existingToken.save();
         } else {
-          console.log("Verification email sent: " + info.response);
+          const tokenData = new Token({ token, userId: user._id });
+          await tokenData.save();
         }
-      });
-
-      return res
-        .status(HttpStatus.StatusCodes.CREATED)
-        .header('auth-token', token)
-        .json({ message: "user created successful", user, token });
+  
+        // Send verification email
+        const verificationLink = `http://localhost:3000/api/mihab/verify?email=${req.body.google_credentials.email}&code=${verificationCode}`;
+        const mailOptions = {
+          from: "mihabappual@gmail.com",
+          to: req.body.google_credentials.email,
+          subject: "Please verify your email address",
+          html: `<p>Dear ${req.body.google_credentials.name},</p><p>Please click on the following link to verify your email address:</p><p><a href="${verificationLink}">${verificationLink}</a></p><p>Thanks,</p><p>Your App Team</p>`,
+        };
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log("Verification email sent: " + info.response);
+          }
+        });
+  
+        return res
+          .status(HttpStatus.StatusCodes.CREATED)
+          .header('auth-token', token)
+          .json({ message: "user created successful", user, token });
+      } catch (error) {
+        console.error("Error verifying Google token:", error);
+        return res.status(HttpStatus.StatusCodes.UNAUTHORIZED).json({ message: "Invalid token" });
+      }
     }
     //console.log(req.body)
 
@@ -193,51 +200,45 @@ module.exports = {
   },
 
   async loginUser(req, res) {
- console.log(req.body.google_credentials);
-
-    if (req.body.google_credentials) {
-      const client = new OAuth2Client();
-      const ticket = await client.verifyIdToken({
-        idToken: req.body.google_credentials.id_token,
-        audience: process.env.GOOGLE_CLIENT_ID,
-      });
-      const payload = ticket.getPayload();
-      const email = payload["email"];
-      const user = await User.findOne({ email: email });
-      if (!user) {
-        return res
-          .status(HttpStatus.StatusCodes.NOT_FOUND)
-          .json({ message: "User not found" });
-      }
-      //  if (!user.isVerified) {
-      //  return res.status(HttpStatus.StatusCodes.UNAUTHORIZED).json({ message: 'Your email has not been verified yet. Please verify your email and try again.' });
-      //  }
-      // Generate JWT and set it as a cookie
-      const token = jwt.sign(
-        { _id: user._id, username: user.username },
-        dbConfig.secret,
-        {
-          expiresIn: "5h",
-        }
-      );
-      
-      res.cookie("auth", token);
-      const existingToken = await Token.findOne({ userId: user._id });
-      //console.log(existingToken);
-           if(existingToken){
-              existingToken.token= token;
-              await existingToken.save();
-            }
-            else {
-              const tokenData = new Token({ token, userId: user._id });
-              //console.log(tokenData)
-              await tokenData.save();
-            }
+ //console.log(req.body.google_credentials);
+ if (req.body.google_credentials) {
+  try {
+    const tokens = req.body.google_credentials.id_token;
+    // Verify the token using firebase-admin library
+    const decodedToken = await admin.auth().verifyIdToken(tokens);
+    const email = decodedToken.email;
+    const user = await User.findOne({ email: email });
+    if (!user) {
       return res
-        .status(HttpStatus.StatusCodes.OK)
-        .header('auth-token', token)
-        .json({ message: "Login successful", user, token });
+        .status(HttpStatus.StatusCodes.NOT_FOUND)
+        .json({ message: "User not found" });
     }
+    // Generate JWT and set it as a cookie
+    const token = jwt.sign(
+      { _id: user._id, username: user.username },
+      dbConfig.secret,
+      {
+        expiresIn: "5h",
+      }
+    );
+    res.cookie("auth", token);
+    const existingToken = await Token.findOne({ userId: user._id });
+    if (existingToken) {
+      existingToken.token = token;
+      await existingToken.save();
+    } else {
+      const tokenData = new Token({ token, userId: user._id });
+      await tokenData.save();
+    }
+    return res
+      .status(HttpStatus.StatusCodes.OK)
+      .header("auth-token", token)
+      .json({ message: "Login successful", user, token });
+  } catch (error) {
+    console.error("Error verifying Google token:", error);
+    return res.status(HttpStatus.StatusCodes.UNAUTHORIZED).json({ message: "Invalid token" });
+  }
+}
 
     //console.log(req.body)
     if (!req.body.email || !req.body.password) {
