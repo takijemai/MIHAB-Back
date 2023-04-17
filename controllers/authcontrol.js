@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const nodemailer = require("nodemailer");
 const admin = require("firebase-admin");
-const serviceAccount = require("../../mihab-afaa1-firebase-adminsdk-i9jhe-682e873f79.json");
+const serviceAccount = require("../config/mihab-afaa1-firebase-adminsdk-i9jhe-682e873f79.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
