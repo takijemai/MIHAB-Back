@@ -8,7 +8,7 @@ const joi = require('joi')
 const request = require('request')
 const cors = require('cors')
 const corsOptions ={
-    origin:   ['http://localhost:8100', 'https://mihab-back.herokuapp.com/','http://localhost'],
+    origin:   ['http://localhost:8100', 'https://mihab-back.herokuapp.com/','http://localhost','mihab-afaa1.firebaseapp.com'],
     credentials:true,  
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -21,7 +21,7 @@ app.use(cors(corsOptions))
 const server = require('http').createServer(app)
 const io = require('socket.io')(server,{
     cors: {
-    origin:  ['http://localhost:8100', 'https://mihab-back.herokuapp.com/','http://localhost'],
+    origin:  ['http://localhost:8100', 'https://mihab-back.herokuapp.com/','http://localhost','mihab-afaa1.firebaseapp.com'],
     credentials:true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
